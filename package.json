@@ -1,0 +1,14 @@
+{
+  "name": "promised-io-node-http-server",
+  "version": "0.3.0",
+  "dependencies": {
+    "amdefine": "0.0.1",
+    "compose": "https://github.com/kriszyp/compose/tarball/a4e0b1bfae494ac6c2f3964783ddd91c0376b9cc",
+    "promised-io-node": "https://github.com/promised-io/node/tarball/master"
+  },
+  "directories": {
+    "lib": ".",
+    "doc": "./doc"
+  },
+  "main": "./main.js"
+}
