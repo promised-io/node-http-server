@@ -13,7 +13,7 @@ define([
     }
 
     // Set implicit headers so we can back out if sending the body fails
-    this.statuscode = response.status;
+    this.statusCode = response.status;
     Object.keys(response.headers).forEach(function(name){
       this.setHeader(name, response.headers[name]);
     }, this);
