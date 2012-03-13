@@ -34,18 +34,21 @@ define([
       headers: {
         enumerable: true,
         value: req.headers
-      },
-
-      /**
-      * node-http-server.Request#body -> node-stream.Stream
-      *
-      * A stream for the request body.
-      **/
-      body: {
-        enumerable: true,
-        value: new Stream(req)
       }
     });
+
+    /**
+    * node-http-server.Request#body -> node-stream.Stream
+    *
+    * A stream for the request body, unless the request method is GET, DELETE
+    * or HEAD.
+    **/
+    if(req.method !== "GET" && req.method !== "DELETE" && req.method !== "HEAD"){
+      Object.defineProperty(this, "body", {
+        enumerable: true,
+        value: new Stream(req)
+      });
+    }
 
     /**
     * node-http-server.Request#expectContinue -> promise.Deferred
