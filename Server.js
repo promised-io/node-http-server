@@ -10,8 +10,8 @@ define([
   "http",
   "events",
   "./_requestHandler",
-  "promised-io/promise/node-style/apply"
-], function(Compose, http, events, requestHandler, applyAsync){
+  "promised-io/promise/node-style/wrap"
+], function(Compose, http, events, requestHandler, wrapAsync){
   "use strict";
 
   /**
@@ -46,20 +46,20 @@ define([
     **/
 
     /**
-    * node-http-server.Server#listen(port[, hostname])
+    * node-http-server.Server#listen(port[, hostname]) -> promise.Promise
     * - port (String | Number)
     * - hostname (String)
     *
-    * Start listening.
+    * Start listening. Returns a promise for when the server is in fact listening.
     **/
     /**
-    * node-http-server.Server#listen(path)
+    * node-http-server.Server#listen(path) -> promise.Promise
     * - path (String)
     *
-    * Start listening.
+    * Start listening. Returns a promise for when the server is in fact listening.
     **/
     listen: function(){
-      return applyAsync(this._server.listen, this._server, arguments);
+      return wrapAsync(this._server.listen, true).apply(this._server, arguments);
     },
 
     /**
