@@ -8,9 +8,10 @@ if (typeof define !== 'function') { var define = (require('amdefine'))(module); 
 define([
   "compose",
   "url",
+  "querystring",
   "promised-io/promise/defer",
   "promised-io/node-stream/Stream"
-], function(Compose, url, defer, Stream){
+], function(Compose, url, querystring, defer, Stream){
   var EXPECT_CONTINUE = /^100-continue(;|$)/;
 
   /**
@@ -101,6 +102,15 @@ define([
     **/
     get query(){
       return this._parsePath().query;
+    },
+
+    /**
+    * node-http-server.Request#query -> Object
+    *
+    * The query component from the path, parsed into a frozen object.
+    **/
+    get queryObject(){
+      return this._queryObject || (this._queryObject = Object.freeze(querystring.parse(this.query)));
     },
 
     /**
