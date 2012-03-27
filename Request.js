@@ -35,6 +35,117 @@ define([
       headers: {
         enumerable: true,
         value: req.headers
+      },
+
+      _parsedPathValue: {
+        configurable: true,
+        enumerable: false,
+        writable: true,
+        value: undefined
+      },
+
+      _parsePath: {
+        enumerable: false,
+        get: function(){
+          return this._parsedPathValue || (this._parsedPathValue = url.parse("http://" + this.headers.host + this.path));
+        }
+      },
+
+      /**
+      * node-http-server.Request#method -> String
+      *
+      * Request method.
+      **/
+      method: {
+        enumerable: true,
+        value: req.method
+      },
+
+      /**
+      * node-http-server.Request#path -> String
+      *
+      * Request path, including query component.
+      **/
+      path: {
+        enumerable: true,
+        value: req.url
+      },
+
+      /**
+      * node-http-server.Request#pathname -> String
+      *
+      * Request pathname, excluding query component.
+      **/
+      pathname: {
+        enumerable: true,
+        get: function(){
+          return this._parsePath.pathname;
+        }
+      },
+
+      /**
+      * node-http-server.Request#query -> String
+      *
+      * Query component from path.
+      **/
+      query: {
+        enumerable: true,
+        get: function(){
+          return this._parsePath.query;
+        }
+      },
+
+      /**
+      * node-http-server.Request#query -> Object
+      *
+      * The query component from the path, parsed into a frozen object.
+      **/
+      _queryObject: {
+        configurable: true,
+        enumerable: false,
+        writable: true,
+        value: undefined
+      },
+
+      queryObject: {
+        enumerable: true,
+        get: function(){
+          return this._queryObject || (this._queryObject = Object.freeze(querystring.parse(this.query)));
+        }
+      },
+
+      /**
+      * node-http-server.Request#host -> String
+      *
+      * Request host, including port.
+      **/
+      host: {
+        enumerable: true,
+        value: req.headers.host
+      },
+
+      /**
+      * node-http-server.Request#hostname -> String
+      *
+      * Request hostname, excluding port.
+      **/
+      hostname: {
+        enumerable: true,
+        get: function(){
+          return this._parsePath.hostname;
+        }
+      },
+
+      /**
+      * node-http-server.Request#port -> String
+      *
+      * Port from request host.
+      **/
+      port: {
+        enumerable: true,
+        get: function(){
+          return this._parsePath.port;
+        }
       }
     });
 
@@ -62,82 +173,6 @@ define([
         enumerable: true,
         value: defer()
       });
-    }
-  }, {
-    _parsePath: function(){
-      return this._parsed || url.parse("http://" + this.headers.host + this.path);
-    },
-
-    /**
-    * node-http-server.Request#method -> String
-    *
-    * Request method.
-    **/
-    get method(){
-      return this._rawRequest.method;
-    },
-
-    /**
-    * node-http-server.Request#path -> String
-    *
-    * Request path, including query component.
-    **/
-    get path(){
-      return this._rawRequest.url;
-    },
-
-    /**
-    * node-http-server.Request#pathname -> String
-    *
-    * Request pathname, excluding query component.
-    **/
-    get pathname(){
-      return this._parsePath().pathname;
-    },
-
-    /**
-    * node-http-server.Request#query -> String
-    *
-    * Query component from path.
-    **/
-    get query(){
-      return this._parsePath().query;
-    },
-
-    /**
-    * node-http-server.Request#query -> Object
-    *
-    * The query component from the path, parsed into a frozen object.
-    **/
-    get queryObject(){
-      return this._queryObject || (this._queryObject = Object.freeze(querystring.parse(this.query)));
-    },
-
-    /**
-    * node-http-server.Request#host -> String
-    *
-    * Request host, including port.
-    **/
-    get host(){
-      return this.headers.host;
-    },
-
-    /**
-    * node-http-server.Request#hostname -> String
-    *
-    * Request hostname, excluding port.
-    **/
-    get hostname(){
-      return this._parsePath().hostname;
-    },
-
-    /**
-    * node-http-server.Request#port -> String
-    *
-    * Port from request host.
-    **/
-    get port(){
-      return this._parsePath().port;
     }
   });
 });
