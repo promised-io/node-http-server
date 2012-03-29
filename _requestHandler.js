@@ -63,7 +63,7 @@ define([
           .then(sendResponse.bind(res))
           .fail(handleFailure.bind(res, reportError));
       req.on("close", function(){
-        promise.cancel(new errors.SocketClosedError);
+        promise.cancel(new errors.InboundSocketClosedError);
       });
     };
   };

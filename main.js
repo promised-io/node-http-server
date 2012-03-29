@@ -12,7 +12,7 @@ define([
   "use strict";
 
   return {
-    SocketClosedError: errors.SocketClosedError,
+    InboundSocketClosedError: errors.InboundSocketClosedError,
     Server: Server
   };
 });

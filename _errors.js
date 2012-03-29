@@ -5,9 +5,9 @@ define([
   "promised-io/lib/errorFactory"
 ], function(exports, errorFactory){
   /**
-  * class node-http-server.SocketClosedError
+  * class node-http-server.InboundSocketClosedError
   *
-  * The request socket was unexpectedly closed.
+  * The inbound request socket was unexpectedly closed.
   **/
-  exports.SocketClosedError = errorFactory("SocketClosedError", "Request socket closed.");
+  exports.InboundSocketClosedError = errorFactory("InboundSocketClosedError", "Inbound request socket closed.");
 });
