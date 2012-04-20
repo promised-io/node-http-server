@@ -17,7 +17,7 @@ define([
     Object.keys(response.headers).forEach(function(name){
       this.setHeader(name, response.headers[name]);
     }, this);
-    if("body" in response){
+    if(response.body){
       return sendBody(response.body, this);
     }else{
       return this.end();
