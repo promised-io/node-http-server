@@ -7,34 +7,40 @@ define([
 ], function(errors, Request, call){
   "use strict";
 
-  function sendResponse(response){
-    if(!response || !("status" in response) || !("headers" in response)){
+  function noop(){}
+
+  function endRequest(req){
+    if(!req.complete){
+      req.removeAllListeners("data");
+      req.removeAllListeners("end");
+      req.removeAllListeners("error");
+      req.removeAllListeners("close");
+      req.addListener("error", noop);
+      req.resume();
+    }
+  }
+
+  function sendResponse(req, res, response){
+    if(!response || !response.hasOwnProperty("status") || !response.hasOwnProperty("headers")){
       throw new TypeError("Missing status and/or headers");
     }
 
     // Set implicit headers so we can back out if sending the body fails
-    this.statusCode = response.status;
+    res.statusCode = response.status;
     Object.keys(response.headers).forEach(function(name){
-      this.setHeader(name, response.headers[name]);
-    }, this);
+      res.setHeader(name, response.headers[name]);
+    });
     if(response.body){
-      return sendBody(response.body, this);
+      return sendBody(res, response.body).then(function(){
+        endRequest(req);
+      });
     }else{
-      return this.end();
+      res.end();
+      endRequest(req);
     }
   }
 
-  function handleFailure(reportError, error){
-    reportError(error);
-    try{
-      this.writeHead(500);
-      this.end("An unknown error occured.");
-    }catch(error){
-      reportError(error);
-    }
-  }
-
-  function sendBody(body, res){
+  function sendBody(res, body){
     var promise;
     if(typeof body.pipe === "function"){
       promise = call(body.pipe, body, res);
@@ -50,20 +56,31 @@ define([
     return function(req, res){
       var request = new Request(req, options.autoContinue === false);
       var promise;
-
       if(request.expectContinue){
         request.expectContinue.then(function(){
-          !promise.isFulfilled() && res.writeContinue();
+          if(!promise.isFulfilled()){
+            res.writeContinue();
+          }
         }, function(){
-          !promise.isFulfilled() && res.close();
+          if(!promise.isFulfilled()){
+            res.close();
+          }
         });
       }
 
-      promise = call(app, null, request)
-          .then(sendResponse.bind(res))
-          .fail(handleFailure.bind(res, reportError));
+      promise = call(app, null, request).then(function(response){
+        return sendResponse(req, res, response);
+      }).fail(function(error){
+        reportError(error);
+        try{
+          res.writeHead(500);
+          res.end("An unknown error occured.");
+        }catch(error){
+          reportError(error);
+        }
+      });
       req.on("close", function(){
-        promise.cancel(new errors.InboundSocketClosedError);
+        promise.cancel(new errors.InboundSocketClosedError());
       });
     };
   };
