@@ -71,12 +71,14 @@ define([
       promise = call(app, null, request).then(function(response){
         return sendResponse(req, res, response);
       }).fail(function(error){
-        reportError(error);
-        try{
-          res.writeHead(500);
-          res.end("An unknown error occured.");
-        }catch(error){
-          reportError(error);
+        reportError(error, request);
+        if(!res.bytesWritten){
+          try{
+            res.writeHead(500);
+            res.end("An unknown error occured.");
+          }catch(error){
+            reportError(error, request);
+          }
         }
       });
       req.on("close", function(){
