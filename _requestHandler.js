@@ -63,7 +63,7 @@ define([
           }
         }, function(){
           if(!promise.isFulfilled()){
-            res.close();
+            res.destroy();
           }
         });
       }
@@ -72,7 +72,7 @@ define([
         return sendResponse(req, res, response);
       }).fail(function(error){
         reportError(error, request);
-        if(!res.bytesWritten){
+        if(res.socket && !res.socket.destroyed && !res.socket.bytesWritten){
           try{
             res.writeHead(500);
             res.end("An unknown error occured.");
